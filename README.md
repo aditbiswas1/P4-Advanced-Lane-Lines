@@ -24,5 +24,29 @@ This process is encapsulated in a class called ```Calibrator``` which is initial
 
 
 ```python
+from matplotlib import pyplot as plt
+import matplotlib.gridspec as gridspec
+%matplotlib inline
+from components.calibrator import Calibrator
+import cv2
+import numpy as np
+import glob
+
+
+def display_original_and_transformed(image, transormation_function):
+    original = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    transormed = transormation_function(image)
+    
+```
+
+
+```python
+chessboard_image_sources = glob.glob('camera_cal/calibration*.jpg')
+chessboard_images = [cv2.imread(filename) for filename in chessboard_image_sources]
+calibrator = Calibrator(chessboard_images)
+```
+
+
+```python
 
 ```
