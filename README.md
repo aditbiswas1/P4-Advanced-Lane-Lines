@@ -18,7 +18,7 @@ A reliable way to calibrate the camera images is to use objects whose (x, y, z) 
 The openCV library contains an utility function called ``` find_chessboard_images``` which can be used to determine the coordinates of the points on a given image of a chessboard.
 The openCV library also contains an utility function called ```calibrateCamera``` which takes a set of image points and a set of object points and returns the distortion matrix along with other useful tranformation matrices.
 
-I use the f```ind_chessboard_images``` functions to determine the corners of chessboard images and generate object points which can be used to find the matrix.
+I use the ```find_chessboard_images``` functions to determine the corners of chessboard images and generate object points which can be used to find the matrix.
 
 This process is encapsulated in a class called ```Calibrator``` which is initialized in the beginning of the program and contains the undistort method which consistently undistorts images from the camera used to record the footage.
 
@@ -44,7 +44,7 @@ def display_original_and_transformed(image,
     if color_convert_transformed:
         transormed = cv2.cvtColor(transormed, color_transform)
     figure = plt.figure(figsize=(10,10))
-    gs = gridspec.GridSpec(1, 2, top=1., bottom=0., right=1., left=0., hspace=0.,
+    gs = gridspec.GridSpec(1, 2, top=1., bottom=0., right=0.8, left=0., hspace=0.,
         wspace=0.5)
     
     ax = plt.subplot(gs[0])
@@ -107,6 +107,55 @@ display_original_and_transformed(test_image, calibrator.undistort)
 
 
 ![png](output_11_0.png)
+
+
+
+```python
+from components.region_selector import RegionSelector
+```
+
+
+```python
+region_selector = RegionSelector()
+```
+
+
+```python
+def interactive_region_select(bottom_y, top_y, center_x, bottom_width, top_width, image):
+    updated_image = region_selector.update_and_show(
+        bottom_y,
+        top_y,
+        center_x,
+        bottom_width,
+        top_width,
+        image
+    )
+    plt.imshow(updated_image)
+```
+
+
+```python
+from ipywidgets import interact, fixed, IntSlider
+interact(
+    interactive_region_select,
+    bottom_y = IntSlider(min=0,max=750,step=10,value=710),
+    top_y = IntSlider(min=0,max=750,step=10,value=450),
+    center_x = IntSlider(min=0,max=1280,step=10,value=640),
+    bottom_width = IntSlider(min=0,max=640,step=10,value=590),
+    top_width = IntSlider(min=0,max=640,step=10,value=80),
+    image=fixed(test_image))
+    
+```
+
+
+
+
+    <function __main__.interactive_region_select>
+
+
+
+
+![png](output_15_1.png)
 
 
 
