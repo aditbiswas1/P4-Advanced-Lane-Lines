@@ -33,10 +33,29 @@ import numpy as np
 import glob
 
 
-def display_original_and_transformed(image, transormation_function):
+def display_original_and_transformed(image, 
+                                     transormation_function, 
+                                     transormation_title='transformed',
+                                     color_convert_transformed=True, 
+                                     color_transform=cv2.COLOR_BGR2RGB):
+    
     original = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     transormed = transormation_function(image)
+    if color_convert_transformed:
+        transormed = cv2.cvtColor(transormed, color_transform)
+    figure = plt.figure(figsize=(10,10))
+    gs = gridspec.GridSpec(1, 2, top=1., bottom=0., right=1., left=0., hspace=0.,
+        wspace=0.5)
     
+    ax = plt.subplot(gs[0])
+    plt.imshow(original)
+    ax.axis("off")
+    ax.set_title('original image')
+    
+    ax2 = plt.subplot(gs[1])
+    plt.imshow(transormed)
+    ax2.axis("off")
+    ax2.set_title(transormation_title)
 ```
 
 
@@ -45,6 +64,50 @@ chessboard_image_sources = glob.glob('camera_cal/calibration*.jpg')
 chessboard_images = [cv2.imread(filename) for filename in chessboard_image_sources]
 calibrator = Calibrator(chessboard_images)
 ```
+
+demonstration of test calibration results
+
+
+```python
+display_original_and_transformed(chessboard_images[0], calibrator.undistort, 'undistorted')
+```
+
+
+![png](output_7_0.png)
+
+
+
+```python
+display_original_and_transformed(chessboard_images[15], calibrator.undistort, 'undistorted')
+```
+
+
+![png](output_8_0.png)
+
+
+now that we know the calibration is working, lets apply it to the test image
+
+
+```python
+test_image_file = 'test_images/straight_lines1.jpg'
+test_image = cv2.imread(test_image_file)
+display_original_and_transformed(test_image, calibrator.undistort, 'undistorted')
+```
+
+
+![png](output_10_0.png)
+
+
+
+```python
+test_image_file = 'test_images/test2.jpg'
+test_image = cv2.imread(test_image_file)
+display_original_and_transformed(test_image, calibrator.undistort)
+```
+
+
+![png](output_11_0.png)
+
 
 
 ```python
