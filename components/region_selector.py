@@ -12,7 +12,7 @@ class RegionSelector(object):
         self.bottom_right_x = 0
         self.bottom_right_y = 0
         
-    def show_selection(self, image, color_tranform=True):
+    def show_selection(self, image):
         pts = np.array([
                 [self.top_left_x, self.top_left_y],
                 [self.top_right_x, self.top_right_y],
@@ -20,8 +20,6 @@ class RegionSelector(object):
                 [self.bottom_left_x, self.bottom_left_y]
             ], np.int32)
         pts = pts.reshape((-1, 1 ,2 ))
-        if color_tranform:
-            image  = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         selected_region = cv2.polylines(image, [pts], True, (255,0,0), 3)
         return selected_region
     

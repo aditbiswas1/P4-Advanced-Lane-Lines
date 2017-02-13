@@ -10,7 +10,7 @@ class Calibrator(object):
 
 
     def find_chessboard_corners(self, image, nx, ny):
-        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
         found_flag, corners = cv2.findChessboardCorners(gray_image, (nx,ny), None)
         return found_flag , corners
 
