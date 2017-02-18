@@ -27,7 +27,7 @@ This process is encapsulated in a class called ```Calibrator``` which is initial
 from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
 %matplotlib inline
-from components.calibrator import Calibrator
+from components.utils import read_image
 import cv2
 import numpy as np
 import glob
@@ -35,14 +35,10 @@ import glob
 
 def display_original_and_transformed(image, 
                                      transormation_function, 
-                                     transormation_title='transformed',
-                                     color_convert_transformed=True, 
-                                     color_transform=cv2.COLOR_BGR2RGB):
+                                     transormation_title='transformed',):
     
-    original = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    original = image
     transormed = transormation_function(image)
-    if color_convert_transformed:
-        transormed = cv2.cvtColor(transormed, color_transform)
     figure = plt.figure(figsize=(10,10))
     gs = gridspec.GridSpec(1, 2, top=1., bottom=0., right=0.8, left=0., hspace=0.,
         wspace=0.5)
@@ -60,8 +56,9 @@ def display_original_and_transformed(image,
 
 
 ```python
+from components.calibrator import Calibrator
 chessboard_image_sources = glob.glob('camera_cal/calibration*.jpg')
-chessboard_images = [cv2.imread(filename) for filename in chessboard_image_sources]
+chessboard_images = [read_image(filename) for filename in chessboard_image_sources]
 calibrator = Calibrator(chessboard_images)
 ```
 
@@ -90,7 +87,7 @@ now that we know the calibration is working, lets apply it to the test image
 
 ```python
 test_image_file = 'test_images/straight_lines1.jpg'
-test_image = cv2.imread(test_image_file)
+test_image = read_image(test_image_file)
 display_original_and_transformed(test_image, calibrator.undistort, 'undistorted')
 ```
 
@@ -101,8 +98,8 @@ display_original_and_transformed(test_image, calibrator.undistort, 'undistorted'
 
 ```python
 test_image_file = 'test_images/test2.jpg'
-test_image = cv2.imread(test_image_file)
-display_original_and_transformed(test_image, calibrator.undistort)
+test_image_2 = read_image(test_image_file)
+display_original_and_transformed(test_image_2, calibrator.undistort)
 ```
 
 
@@ -139,11 +136,11 @@ from ipywidgets import interact, fixed, IntSlider
 interact(
     interactive_region_select,
     bottom_y = IntSlider(min=0,max=750,step=10,value=710),
-    top_y = IntSlider(min=0,max=750,step=10,value=450),
+    top_y = IntSlider(min=0,max=750,step=10,value=490),
     center_x = IntSlider(min=0,max=1280,step=10,value=640),
-    bottom_width = IntSlider(min=0,max=640,step=10,value=590),
-    top_width = IntSlider(min=0,max=640,step=10,value=80),
-    image=fixed(test_image))
+    bottom_width = IntSlider(min=0,max=640,step=10,value=450),
+    top_width = IntSlider(min=0,max=640,step=10,value=110),
+    image=fixed(calibrator.undistort(test_image)))
     
 ```
 
@@ -156,6 +153,32 @@ interact(
 
 
 ![png](output_15_1.png)
+
+
+
+```python
+from components.pipline import ImagePipeline
+image_pipeline = ImagePipeline()
+image_pipeline.add(calibrator.undistort)
+image_pipeline.add(region_selector.warp)
+```
+
+
+```python
+display_original_and_transformed(region_selector.show_selection(calibrator.undistort(test_image)), image_pipeline.apply, 'perspective transformed')
+```
+
+
+![png](output_17_0.png)
+
+
+
+```python
+display_original_and_transformed(region_selector.show_selection(calibrator.undistort(test_image_2)), image_pipeline.apply, 'perspective transform on curved image')
+```
+
+
+![png](output_18_0.png)
 
 
 

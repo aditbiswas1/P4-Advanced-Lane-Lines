@@ -1,11 +1,14 @@
-'''
-The functions of this module help calibrate images from a camera given a set of chessboard images
-'''
-
 import cv2
 import numpy as np
 
 
+'''
+The Calibrator class contains utilities to keep track of of 
+the distortion matrix of a given camera.
+It needs to be instanted with a set of chessboard images taken
+from the camera and the number of points along a row and column of
+the chessboard images
+'''
 class Calibrator(object):
 
 
