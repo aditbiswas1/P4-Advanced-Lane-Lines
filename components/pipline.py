@@ -19,5 +19,5 @@ class ImagePipeline(object):
         else:
             transformed_image = image
             for op in self.ops:
-                transformed_image = op(image)
+                transformed_image = op(transformed_image)
             return transformed_image
