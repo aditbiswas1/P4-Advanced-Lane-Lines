@@ -21,6 +21,7 @@ class RegionSelector(object):
         self.bottom_right_y = 0
         self.M = None
         self.Minv = None
+        self.original_image = None
         
     def show_selection(self, image):
         pts = np.array([
@@ -31,7 +32,8 @@ class RegionSelector(object):
             ], np.int32)
         pts = pts.reshape((-1, 1 ,2 ))
         imcopy = np.copy(image)
-        selected_region = cv2.polylines(imcopy, [pts], True, (255,0,0), 1)
+
+        selected_region = cv2.polylines(imcopy, [pts], True, 255, 3)
         return selected_region
     
     
@@ -49,6 +51,8 @@ class RegionSelector(object):
         self.top_right_x = center_x + top_width
         self.bottom_left_x = center_x - bottom_width
         self.bottom_right_x = center_x + bottom_width
+        self.M = None
+        self.Minv = None
         
     def update_and_show(self,
                        bottom_y,
@@ -67,6 +71,7 @@ class RegionSelector(object):
         
 
     def warp(self,image):
+        self.original_image = image
         if self.M is None:
             src = np.float32([
                 [self.top_right_x, self.top_right_y],
@@ -89,5 +94,5 @@ class RegionSelector(object):
 
     def warp_inverse(self, image):
         if self.Minv is None:
-            self.warp(image)
+            raise Exception("no Minv precalculated")
         return cv2.warpPerspective(image, self.Minv, (image.shape[1], image.shape[0]), flags=cv2.INTER_LINEAR)

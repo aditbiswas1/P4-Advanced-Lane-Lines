@@ -108,6 +108,7 @@ class ImageBinarizer(object):
 
         
     def binarize(self, image):
+        self.original_image = image
         self.gray_image= None
         self.sobel_y_image = None
         self.sobel_x_image = None
@@ -119,7 +120,7 @@ class ImageBinarizer(object):
 
         combined = np.zeros_like(grad_dir)
         combined[((gradx == 1) & (grady == 1)) | ((grad_mag == 1) & (grad_dir == 1)) | (grad_hls == 1)] = 1
-        return combined
+        return combined * 255
 
 
 
