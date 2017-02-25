@@ -2,7 +2,8 @@ import numpy as np
 import cv2
 
 '''
-This class is 
+This class is used to create the image pipeline in a 
+composable manner
 '''
 class ImagePipeline(object):
 

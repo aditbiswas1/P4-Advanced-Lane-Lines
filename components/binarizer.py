@@ -1,7 +1,10 @@
 import cv2
 import numpy as np
 
-
+'''
+This class generates binary images from the input image
+based on thresholding parameters
+'''
 class ImageBinarizer(object):
 
 

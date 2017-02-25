@@ -3,6 +3,10 @@ import numpy as np
 from collections import deque
 from copy import deepcopy
 
+'''
+This class determines points which represent the lane lines
+from a given birds eye view image.
+'''
 class LaneFinder(object):
 
     def __init__(self, binarizer, region_selector, nwindows=9, margin=100, minpix=50, y_eval=500):
@@ -18,6 +22,9 @@ class LaneFinder(object):
         self.region_selector = region_selector
         self.binarizer = binarizer
 
+    '''
+    carries out sliding window search to determine polynomials
+    '''
     def sliding_window_search(self, binary_warped):
         # Assuming you have created a warped binary image called "binary_warped"
         # Take a histogram of the bottom half of the image
@@ -86,6 +93,9 @@ class LaneFinder(object):
         return self.left_fit_current, self.right_fit_current
 
 
+    '''
+    use sliding windows from previous iterations to determine polynomial in new frame
+    '''
     def non_sliding_window_search(self, binary_warped):
         # Assume you now have a new warped binary image 
         # from the next frame of video (also called "binary_warped")
@@ -107,7 +117,9 @@ class LaneFinder(object):
         self.right_fit_current = np.polyfit(righty, rightx, 2)
         return self.left_fit_current, self.right_fit_current
 
-
+    '''
+    return points reperesenting the lane line on the image
+    '''
     def show_line(self, binary_warped, slide_search=True):
         if (self.left_fit_sliding is  None) or (slide_search is True):
             self.sliding_window_search(binary_warped)
@@ -120,6 +132,9 @@ class LaneFinder(object):
         return left_fitx, right_fitx
 
 
+    '''
+    estimate curvature of the road using the polynomials for the lanes
+    '''
     def get_current_curvature(self):
         left_curvature = np.absolute(((1 + (2 * self.left_fit_current[0] * self.y_eval + self.left_fit_current[1])**2) ** 1.5) \
                         /(2 * self.left_fit_current[0]))
@@ -133,6 +148,9 @@ class LaneFinder(object):
         return (left_curvature, right_curvature)
 
 
+    '''
+    estimate the offset of the vehicle from the center
+    '''
     def get_offset_center(self):
         left_x = self.left_fit_current[0]*self.y_eval**2 + self.left_fit_current[1]*self.y_eval + self.left_fit_current[2]
         right_x = self.right_fit_current[0]*self.y_eval**2 + self.right_fit_current[1]*self.y_eval + self.right_fit_current[2]
@@ -141,7 +159,10 @@ class LaneFinder(object):
 
         return center_offset
 
-
+    '''
+    detect polynomials, estimate the curvature and centers and draw back the results on the 
+    initial input of the pipeline
+    '''
     def plot_lane_on_image(self, binary_warped):
         original_image = self.binarizer.original_image
         left_fitx , right_fitx = self.show_line(binary_warped)
