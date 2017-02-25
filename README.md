@@ -7,6 +7,10 @@ software requirements:
  * python3
  * openCV
  * numpy
+ 
+
+The completed pipeline can be executed using ``` python detect_lanes.py``` from the command line.
+Each component of the pipeline was encapsulted into their own classes which can be found in the components module of the project.
 
 
 ## 1. camera calibration 
@@ -85,6 +89,8 @@ display_original_and_transformed(chessboard_images[15], calibrator.undistort, 'u
 
 now that we know the calibration is working, lets apply it to the test image
 
+since we are going to do multiple transformations on the images, i decided to create a pipeline class which lets me compose a series of transformations to the images.
+
 
 ```python
 from components.pipeline import ImagePipeline
@@ -99,20 +105,27 @@ for im  in test_images[:3] :
 ```
 
 
-![png](output_10_0.png)
+![png](output_11_0.png)
 
 
 
-![png](output_10_1.png)
+![png](output_11_1.png)
 
 
 
-![png](output_10_2.png)
+![png](output_11_2.png)
 
 
 ## 2. Binary Images
 
-now that we have a birds eye view of the road, i need to be able to clearly distinguish between lane lines and the rest of the road. for this I prepared a Image Binarizer class which apply various operations such as sobel threshholding, colour thresholding etc.
+After correctly correcting the camera images for distortion we convert the color image into a binary image consisting of 0 and 1s. We want to do this in a way that the binary image always captures the lanes on the road regardless of changes in the surface quality and shadows created by sorrounding objects. To do this I used a combination of 5 thresholding techniques:
+* sobel thresholding in x direction
+* sobel thresholding in y direction
+* gradient magnitude thresholding
+* gradient direction thresholding
+* color thresholding on S channel in HSV colorspace
+
+I encapsulated the process of making binary images into a class called ImageBinarizer which was then interactively updated to find the suitable parameters for each thresholding method.
 
 
 ```python
@@ -207,7 +220,7 @@ interact(
 
 
 
-![png](output_15_1.png)
+![png](output_16_1.png)
 
 
 
@@ -222,20 +235,24 @@ for im  in test_images[:3] :
 ```
 
 
-![png](output_17_0.png)
+![png](output_18_0.png)
 
 
 
-![png](output_17_1.png)
+![png](output_18_1.png)
 
 
 
-![png](output_17_2.png)
+![png](output_18_2.png)
 
 
 ## 3.  Perspective Transformation
 
-After correcting the images for camera distortion, I transform the image to get a birds eye view of the road. To do this I created a region selector class which could be interactively updated to choose coordinates for an appropriate region of the image which represents the lane. The chosen region is then transformed using ```cv2.warpTransform``` so that the coordinates represent a rectangle, this allows me to get a birds eye view of the road. 
+After converting the images to binary form, I transform the image to get a birds eye view of the road to be able to see the lane lines from a top view. To do this I created a region selector class which creates a trapezium on the image based on some assumptions:
+* the road in front of the car is flat
+* the camera is mounted on the center of the car.
+
+the attributes of the class interactively updated to choose coordinates for an appropriate region of the image which represents the road plane. The chosen region is then transformed using ```cv2.warpTransform``` so that the coordinates represent a rectangle. 
 
 
 ```python
@@ -293,10 +310,8 @@ interact(
 
 
 
-![png](output_23_1.png)
+![png](output_24_1.png)
 
-
-since we are starting to do multiple transformations on the images, i decided to create a pipeline class which lets me compose a series of transformations to the images.
 
 
 ```python
@@ -341,6 +356,22 @@ for im  in test_images :
 ![png](output_26_7.png)
 
 
+## 4. Lane estimation
+
+After the perspective transforms of the binary images are done, we can now proceed to identifying the points of the image which represent a lane and then estimate polynomials which capture the line represented by the lane line.
+
+To do this I took the bottom half of the image and found the histogram of the pixel values. Since the lanes were thresholded we find that the peaks of the histograms represent the position of pixels representing each lane.
+
+I then create two lists for storing pixel indices representing the left lane and right lane. I populate this list by running a sliding window along the y axis for each lane starting at the position found by the histogram peaks and populate the indices lists with pixel positions representing each lane.
+
+after determining which points represent each lane i estimate each lane polynomial by using the ```np.polyfit``` function. 
+
+the polynomials found are then used to estimate the real life curvature of the road alogn with how much the car is offset from the center of the road.
+
+I used the two polynomials to then generate polygon points which are then used to create a lane polygon to draw back to the image.
+
+The entire process of determining appropriate lanes are encapsulated into a class called LaneFinder which can be updated to change number of sliding windows / and margins.
+
 
 ```python
 from components.lanefinder import LaneFinder
@@ -371,7 +402,7 @@ plt.ylim(720, 0)
 
 
 
-![png](output_29_1.png)
+![png](output_31_1.png)
 
 
 
@@ -386,43 +417,79 @@ for im  in test_images :
 ```
 
 
-![png](output_31_0.png)
+![png](output_33_0.png)
 
 
 
-![png](output_31_1.png)
+![png](output_33_1.png)
 
 
 
-![png](output_31_2.png)
+![png](output_33_2.png)
 
 
 
-![png](output_31_3.png)
+![png](output_33_3.png)
 
 
 
-![png](output_31_4.png)
+![png](output_33_4.png)
 
 
 
-![png](output_31_5.png)
+![png](output_33_5.png)
 
 
 
-![png](output_31_6.png)
+![png](output_33_6.png)
 
 
 
-![png](output_31_7.png)
+![png](output_33_7.png)
 
+
+## 5. Complete Pipeline
+
+after playing around with parameters in each of the steps of the pipeline, the completed image pipeline was encapsulated into a class called LaneDetector
+
+
+```python
+class LaneDetector(object):
+
+    def __init__(self, chessboard_images):
+        self.image_pipeline = ImagePipeline()
+        self.calibrator = Calibrator(chessboard_images)
+
+        self.region_selector = RegionSelector()
+        self.region_selector.update_points(700,460,640,640,90)
+        
+        self.binarizer = ImageBinarizer(
+                                    sobel_x_thresh=(20, 255),
+                                    sobel_y_thresh=(1, 255),
+                                    mag_thresh=(32, 255),
+                                    dir_thresh=(0, 0.5),
+                                    hls_thresh=(172, 255))
+
+        self.lanefinder = LaneFinder(self.binarizer, self.region_selector)
+
+        self.image_pipeline.add(self.calibrator.undistort)
+        self.image_pipeline.add(self.binarizer.binarize)
+        self.image_pipeline.add(self.region_selector.warp)
+        self.image_pipeline.add(self.lanefinder.plot_lane_on_image)        
+
+
+    def detect(self, image):
+        return self.image_pipeline.apply(image)
+```
+
+This lane detector class is then used to process each frame of the project video and generate the video with lanes in each frame identified.
 
 
 ```python
 from moviepy.editor import VideoFileClip
 from IPython.display import HTML
 clip1 = VideoFileClip('project_video.mp4')
-project_clip = clip1.fl_image(image_pipeline.apply) #NOTE: this function expects color images!!
+project_clip = clip1.fl_image(LaneDetector.detect) #NOTE: this function expects color images!!
 project_clip.write_videofile('main_project_output.mp4', audio=False)
 ```
 
@@ -438,7 +505,10 @@ project_clip.write_videofile('main_project_output.mp4', audio=False)
     
 
 
+## Reflection
 
-```python
-
-```
+While the lane finding project performs decent on the project video there are quite a few limitations to the approach that was taken :
+1. the entire pipeline is dependant on the quality of binary images generated. the parameters for this video were specifically tuned to daylight conditions which may mean that this model is not robust enough to behave well in the night.
+2. the assumptions used to create the pipeline were based on car traveling on fairly flat surface and along the road. It probably doesnt capture the lanes well on a very rapidly changing surface or when the car is not in ideal situations such as during accidents or swerves.
+3. while the pipeline works for most of the video, there are certain situations where it doesnt do too well. The algorithm ive implemented did not take into consideration historical information from previous frames of the video which could be used to determine the confidence of the detection algorithm and generate a smoother output result.
+4. in a future iteration i would like to explore deep learning algorithms to determine the segmentation of the lanes as i think intuitively the convolution layers would result in more robust features than the thresholding techniques used.

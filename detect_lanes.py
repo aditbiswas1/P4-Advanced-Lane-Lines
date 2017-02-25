@@ -46,6 +46,6 @@ chessboard_images = [read_image(filename) for filename in chessboard_image_sourc
 lane_detector = LaneDetector(chessboard_images)
 
 
-clip1 = VideoFileClip('project_video.mp4')
+clip1 = VideoFileClip('challenge_video.mp4')
 project_clip = clip1.fl_image(lane_detector.detect)
-project_clip.write_videofile('main_project_output_2.mp4', audio=False)
+project_clip.write_videofile('challenge_output.mp4', audio=False)
