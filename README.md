@@ -75,7 +75,7 @@ display_original_and_transformed(chessboard_images[0], calibrator.undistort, 'un
 ```
 
 
-![png](output_7_0.png)
+![png](output_images/output_7_0.png)
 
 
 
@@ -84,7 +84,7 @@ display_original_and_transformed(chessboard_images[15], calibrator.undistort, 'u
 ```
 
 
-![png](output_8_0.png)
+![png](output_images/output_8_0.png)
 
 
 now that we know the calibration is working, lets apply it to the test image
@@ -105,15 +105,15 @@ for im  in test_images[:3] :
 ```
 
 
-![png](output_11_0.png)
+![png](output_images/output_11_0.png)
 
 
 
-![png](output_11_1.png)
+![png](output_images/output_11_1.png)
 
 
 
-![png](output_11_2.png)
+![png](output_images/output_11_2.png)
 
 
 ## 2. Binary Images
@@ -220,7 +220,7 @@ interact(
 
 
 
-![png](output_16_1.png)
+![png](output_images/output_16_1.png)
 
 
 
@@ -235,15 +235,15 @@ for im  in test_images[:3] :
 ```
 
 
-![png](output_18_0.png)
+![png](output_images/output_18_0.png)
 
 
 
-![png](output_18_1.png)
+![png](output_images/output_18_1.png)
 
 
 
-![png](output_18_2.png)
+![png](output_images/output_18_2.png)
 
 
 ## 3.  Perspective Transformation
@@ -310,7 +310,7 @@ interact(
 
 
 
-![png](output_24_1.png)
+![png](output_images/output_24_1.png)
 
 
 
@@ -325,35 +325,35 @@ for im  in test_images :
 ```
 
 
-![png](output_26_0.png)
+![png](output_images/output_26_0.png)
 
 
 
-![png](output_26_1.png)
+![png](output_images/output_26_1.png)
 
 
 
-![png](output_26_2.png)
+![png](output_images/output_26_2.png)
 
 
 
-![png](output_26_3.png)
+![png](output_images/output_26_3.png)
 
 
 
-![png](output_26_4.png)
+![png](output_images/output_26_4.png)
 
 
 
-![png](output_26_5.png)
+![png](output_images/output_26_5.png)
 
 
 
-![png](output_26_6.png)
+![png](output_images/output_26_6.png)
 
 
 
-![png](output_26_7.png)
+![png](output_images/output_26_7.png)
 
 
 ## 4. Lane estimation
@@ -402,7 +402,7 @@ plt.ylim(720, 0)
 
 
 
-![png](output_31_1.png)
+![png](output_images/output_31_1.png)
 
 
 
@@ -417,35 +417,35 @@ for im  in test_images :
 ```
 
 
-![png](output_33_0.png)
+![png](output_images/output_33_0.png)
 
 
 
-![png](output_33_1.png)
+![png](output_images/output_33_1.png)
 
 
 
-![png](output_33_2.png)
+![png](output_images/output_33_2.png)
 
 
 
-![png](output_33_3.png)
+![png](output_images/output_33_3.png)
 
 
 
-![png](output_33_4.png)
+![png](output_images/output_33_4.png)
 
 
 
-![png](output_33_5.png)
+![png](output_images/output_33_5.png)
 
 
 
-![png](output_33_6.png)
+![png](output_images/output_33_6.png)
 
 
 
-![png](output_33_7.png)
+![png](output_images/output_33_7.png)
 
 
 ## 5. Complete Pipeline
