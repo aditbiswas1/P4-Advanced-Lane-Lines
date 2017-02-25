@@ -509,10 +509,10 @@ project_clip.write_videofile('main_project_output.mp4', audio=False)
 
 While the lane finding project performs decent on the project video there are quite a few limitations to the approach that was taken :
 
-    1. the entire pipeline is dependant on the quality of binary images generated. the parameters for this video were specifically tuned to daylight conditions which may mean that this model is not robust enough to behave well in the night.
+1. the entire pipeline is dependant on the quality of binary images generated. the parameters for this video were specifically tuned to daylight conditions which may mean that this model is not robust enough to behave well in the night.
 
-    2. the assumptions used to create the pipeline were based on car traveling on fairly flat surface and along the road. It probably doesnt capture the lanes well on a very rapidly changing surface or when the car is not in ideal situations such as during accidents or swerves.
+2. the assumptions used to create the pipeline were based on car traveling on fairly flat surface and along the road. It probably doesnt capture the lanes well on a very rapidly changing surface or when the car is not in ideal situations such as during accidents or swerves.
 
-    3. while the pipeline works for most of the video, there are certain situations where it doesnt do too well. The algorithm ive implemented did not take into consideration historical information from previous frames of the video which could be used to determine the confidence of the detection algorithm and generate a smoother output result.
+3. while the pipeline works for most of the video, there are certain situations where it doesnt do too well. The algorithm ive implemented did not take into consideration historical information from previous frames of the video which could be used to determine the confidence of the detection algorithm and generate a smoother output result.
     
-    4. in a future iteration i would like to explore deep learning algorithms to determine the segmentation of the lanes as i think intuitively the convolution layers would result in more robust features than the thresholding techniques used.
+4. in a future iteration i would like to explore deep learning algorithms to determine the segmentation of the lanes as i think intuitively the convolution layers would result in more robust features than the thresholding techniques used.
